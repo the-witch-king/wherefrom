@@ -5,10 +5,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
-	"github.com/opentracing/opentracing-go/log"
 	"github.com/rodaine/table"
 )
 
@@ -42,10 +44,10 @@ type MALPaging struct {
 }
 
 type JikanGetPersonVoicesResponse struct {
-	Data []JikanPersonVoices `json:"data"`
+	Data []JikanPersonVoice `json:"data"`
 }
 
-type JikanPersonVoices struct {
+type JikanPersonVoice struct {
 	Role  string `json:"role"`
 	Anime struct {
 		MalID  int    `json:"mal_id"`
@@ -88,26 +90,17 @@ func main() {
 	}
 
 	seenAnime, err := getUsersSeenAnime(userName)
-
 	if err != nil {
-		log.Error("Unable to retrieve user's seen anime.\nOriginal error: %v", err)
-		os.Exit(420)
+		log.Fatalf("Unable to retrieve user's seen anime.\nOriginal error: %v", err)
 	}
 
 	fmt.Println("For actor with ID: ", actorId)
-
-	// Get animes from person
-	personUrl := fmt.Sprintf("https://api.jikan.moe/v4/people/%s/voices", actorId)
-	personResp, err := http.Get(personUrl)
-
+	voiceRoles, err := getVoiceRoles(actorId)
 	if err != nil {
-		panic("NONONO")
+		log.Fatalf("Unable to retrieve actor's voice roles.\nOriginal error: %v", err)
 	}
 
-	voiceRoles := JikanGetPersonVoicesResponse{}
-	err = json.NewDecoder(personResp.Body).Decode(&voiceRoles)
-
-	if len(voiceRoles.Data) < 1 {
+	if len(voiceRoles) < 1 {
 		fmt.Println("You haven't seen anything that this person has voice acted in.")
 		os.Exit(42)
 	}
@@ -115,13 +108,12 @@ func main() {
 	fmt.Printf("\nYou've seen them in: \n\n=============================\n")
 	tbl := table.New("Show", "Character")
 
-	for _, voiceRole := range voiceRoles.Data {
-		if anime, seen := seenAnime[fmt.Sprintf("%d", voiceRole.Anime.MalID)]; seen {
+	for _, vr := range voiceRoles {
+		if anime, seen := seenAnime[fmt.Sprintf("%d", vr.Anime.MalID)]; seen {
 			// fmt.Printf("\n[%s]:\t\t[%s]!", anime.Node.Title, voiceRole.Character.Name)
-			tbl.AddRow(anime.Node.Title, voiceRole.Character.Name)
+			tbl.AddRow(anime.Node.Title, vr.Character.Name)
 		}
 	}
-
 	tbl.Print()
 }
 
@@ -146,6 +138,10 @@ func getUsersSeenAnime(userName string) (map[string]MALAnime, error) {
 
 		defer resp.Body.Close()
 
+		if isHttpError(resp) {
+			return nil, generateHttpError(resp)
+		}
+
 		responseData := MALUserAnimeListResponse{}
 		err = json.NewDecoder(resp.Body).Decode(&responseData)
 
@@ -153,11 +149,56 @@ func getUsersSeenAnime(userName string) (map[string]MALAnime, error) {
 			return nil, err
 		}
 
-		nextUrl = responseData.Paging.Next
 		for _, anime := range responseData.Data {
 			seenAnime[fmt.Sprintf("%d", anime.Node.Id)] = anime
 		}
+
+		nextUrl = responseData.Paging.Next
 	}
 
 	return seenAnime, nil
+}
+
+func getVoiceRoles(actorId string) ([]JikanPersonVoice, error) {
+	personUrl := fmt.Sprintf("https://api.jikan.moe/v4/people/%s/voices", actorId)
+	resp, err := http.Get(personUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if isHttpError(resp) {
+		return nil, generateHttpError(resp)
+	}
+
+	voiceRoles := JikanGetPersonVoicesResponse{}
+	err = json.NewDecoder(resp.Body).Decode(&voiceRoles)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(voiceRoles.Data) < 1 {
+		return []JikanPersonVoice{}, nil
+	}
+
+	return voiceRoles.Data, nil
+}
+
+func isHttpError(resp *http.Response) bool {
+	return resp.StatusCode < 200 || resp.StatusCode > 299
+}
+
+func generateHttpError(resp *http.Response) error {
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		errorBody, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			errorBody = []byte("Unable to parse response body")
+		}
+
+		return fmt.Errorf("Server error.\nStatus Code: %d\nResponse: %v", resp.StatusCode, string(errorBody))
+	}
+
+	return nil
 }
