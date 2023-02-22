@@ -1,5 +1,25 @@
 package main
 
+// =============
+// = AWS TYPES =
+// =============
+type UserPayload struct {
+	UserName string `json:"username"`
+	ActorId string `json:"actorId"`
+}
+
+// =========
+// = OTHER =
+// =========
+type Appearance struct {
+	Show string `json:"show"`
+	Character string `json:"character"`
+}
+
+
+// =============
+// = MAL TYPES =
+// =============
 type MALUserAnimeListResponse struct {
 	Data   []MALAnime `json:"data"`
 	Paging MALPaging  `json:"paging"`
@@ -27,6 +47,9 @@ type MALPaging struct {
 	Next string `json:"next"`
 }
 
+// ===============
+// = JIKAN TYPES =
+// ===============
 type JikanGetPersonVoicesResponse struct {
 	Data []JikanPersonVoice `json:"data"`
 }
