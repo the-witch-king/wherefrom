@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/rodaine/table"
 )
 
 const CLIENT_ID_KEY = "MAL_CLIENT_ID"
@@ -129,15 +131,20 @@ func main() {
 	voiceRoles := JikanGetPersonVoicesResponse{}
 	err = json.NewDecoder(personResp.Body).Decode(&voiceRoles)
 
-  if len(voiceRoles.Data) < 1 {
-    fmt.Println("You haven't seen anything that this person has voice acted in.")
-    os.Exit(42)
-  }
+	if len(voiceRoles.Data) < 1 {
+		fmt.Println("You haven't seen anything that this person has voice acted in.")
+		os.Exit(42)
+	}
 
-  fmt.Println("You've seen them in: ")
+	fmt.Printf("\nYou've seen them in: \n\n=============================\n")
+	tbl := table.New("Show", "Character")
+
 	for _, voiceRole := range voiceRoles.Data {
 		if anime, seen := seenAnime[fmt.Sprintf("%d", voiceRole.Anime.MalID)]; seen {
-      fmt.Printf("\n[%s]:\t\t[%s]!", anime.Node.Title, voiceRole.Character.Name)
+			// fmt.Printf("\n[%s]:\t\t[%s]!", anime.Node.Title, voiceRole.Character.Name)
+			tbl.AddRow(anime.Node.Title, voiceRole.Character.Name)
 		}
 	}
+
+	tbl.Print()
 }
