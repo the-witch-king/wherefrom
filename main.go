@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/opentracing/opentracing-go/log"
 	"github.com/rodaine/table"
 )
 
@@ -73,48 +74,24 @@ func printHelp() {
 }
 
 func main() {
-	seenAnime := map[string]MALAnime{}
 
 	if len(os.Args) < 3 {
 		printHelp()
 		os.Exit(420)
 	}
 
-	userWithList := os.Args[1]
+	userName := os.Args[1]
 	actorId := os.Args[2]
 
-	if userWithList == "" || actorId == "" {
+	if userName == "" || actorId == "" {
 		os.Exit(69)
 	}
 
-	nextUrl := fmt.Sprintf("https://api.myanimelist.net/v2/users/%s/animelist", userWithList)
-	for nextUrl != "" {
-		req, err := http.NewRequest("GET", nextUrl, nil)
+	seenAnime, err := getUsersSeenAnime(userName)
 
-		if err != nil {
-			panic("FUCK")
-		}
-		req.Header.Add("X-MAL-CLIENT-ID", os.Getenv(CLIENT_ID_KEY))
-
-		resp, err := http.DefaultClient.Do(req)
-
-		if err != nil {
-			panic("FUIDGE")
-		}
-
-		defer resp.Body.Close()
-
-		responseData := MALUserAnimeListResponse{}
-		err = json.NewDecoder(resp.Body).Decode(&responseData)
-
-		if err != nil {
-			panic(err)
-		}
-
-		nextUrl = responseData.Paging.Next
-		for _, anime := range responseData.Data {
-			seenAnime[fmt.Sprintf("%d", anime.Node.Id)] = anime
-		}
+	if err != nil {
+		log.Error("Unable to retrieve user's seen anime.\nOriginal error: %v", err)
+		os.Exit(420)
 	}
 
 	fmt.Println("For actor with ID: ", actorId)
@@ -124,7 +101,6 @@ func main() {
 	personResp, err := http.Get(personUrl)
 
 	if err != nil {
-
 		panic("NONONO")
 	}
 
@@ -147,4 +123,41 @@ func main() {
 	}
 
 	tbl.Print()
+}
+
+func getUsersSeenAnime(userName string) (map[string]MALAnime, error) {
+	seenAnime := map[string]MALAnime{}
+	nextUrl := fmt.Sprintf("https://api.myanimelist.net/v2/users/%s/animelist", userName)
+
+	for nextUrl != "" {
+		req, err := http.NewRequest("GET", nextUrl, nil)
+
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Add("X-MAL-CLIENT-ID", os.Getenv(CLIENT_ID_KEY))
+
+		resp, err := http.DefaultClient.Do(req)
+
+		if err != nil {
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+
+		responseData := MALUserAnimeListResponse{}
+		err = json.NewDecoder(resp.Body).Decode(&responseData)
+
+		if err != nil {
+			return nil, err
+		}
+
+		nextUrl = responseData.Paging.Next
+		for _, anime := range responseData.Data {
+			seenAnime[fmt.Sprintf("%d", anime.Node.Id)] = anime
+		}
+	}
+
+	return seenAnime, nil
 }
