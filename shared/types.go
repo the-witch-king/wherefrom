@@ -1,4 +1,4 @@
-package main
+package shared 
 
 type Appearance struct {
 	Show      string `json:"show"`

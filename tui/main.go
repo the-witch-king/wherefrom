@@ -1,4 +1,4 @@
-package main
+package main  
 
 import (
 	"fmt"
@@ -7,13 +7,13 @@ import (
 
 	"wherefrom/m/v2/jikan"
 	"wherefrom/m/v2/mal"
+	"wherefrom/m/v2/shared"
 )
 
 const CLIENT_ID_KEY = "MAL_CLIENT_ID"
-
 var MAL_CLIENT_ID = os.Getenv(CLIENT_ID_KEY)
 
-func getActorInSeenAnimes(malUserName string, actorId string) []Appearance {
+func getActorInSeenAnimes(malUserName string, actorId string) []shared.Appearance {
 	mc := mal.MakeMALClient(MAL_CLIENT_ID)
 	seenAnimes, err := mc.GetUserSeenAnime(malUserName)
 
@@ -22,17 +22,17 @@ func getActorInSeenAnimes(malUserName string, actorId string) []Appearance {
 	}
 
 	jc := jikan.MakeJikanClient()
-	voiceRoles, err := jc.GetVoiceRoles(actorId)
+	voiceRoles, err := jc.GetPersonFull(actorId)
 
 	if err != nil {
 		log.Fatalf("Unable to retrieve voice actor roles: %v", err)
 	}
 
-	seenIn := []Appearance{}
+	seenIn := []shared.Appearance{}
 
 	for _, vr := range voiceRoles {
 		if anime, seen := seenAnimes[fmt.Sprintf("%d", vr.Anime.MalID)]; seen {
-			seenIn = append(seenIn, Appearance{Show: anime.Node.Title, Character: vr.Character.Name})
+			seenIn = append(seenIn, shared.Appearance{Show: anime.Node.Title, Character: vr.Character.Name})
 		}
 	}
 
