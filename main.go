@@ -1,39 +1,31 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
+	"wherefrom/m/v2/jikan"
+	"wherefrom/m/v2/mal"
 )
 
 const CLIENT_ID_KEY = "MAL_CLIENT_ID"
 
-var errorLogger = log.New(os.Stderr, "ERROR ", log.Llongfile)
-var MalClientId = os.Getenv(CLIENT_ID_KEY)
+var MAL_CLIENT_ID = os.Getenv(CLIENT_ID_KEY)
 
-func getActorInSeenAnimes(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	userPayload := &UserPayload{}
-	err := json.Unmarshal([]byte(req.Body), userPayload)
+func getActorInSeenAnimes(malUserName string, actorId string) []Appearance {
+	mc := mal.MakeMALClient(MAL_CLIENT_ID)
+	seenAnimes, err := mc.GetUserSeenAnime(malUserName)
 
 	if err != nil {
-		return errorHandler(err)
+		log.Fatalf("Unable to retrieve seen animes: %v", err)
 	}
 
-	seenAnimes, err := getUsersSeenAnime(userPayload.UserName)
+	jc := jikan.MakeJikanClient()
+	voiceRoles, err := jc.GetVoiceRoles(actorId)
 
 	if err != nil {
-		return errorHandler(err)
-	}
-
-	voiceRoles, err := getVoiceRoles(userPayload.ActorId)
-
-	if err != nil {
-		return errorHandler(err)
+		log.Fatalf("Unable to retrieve voice actor roles: %v", err)
 	}
 
 	seenIn := []Appearance{}
@@ -44,27 +36,16 @@ func getActorInSeenAnimes(req events.APIGatewayProxyRequest) (events.APIGatewayP
 		}
 	}
 
-	responseBody, err := json.Marshal(seenIn)
-
-	if err != nil {
-		errorHandler(err)
-	}
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK,
-		Body:       string(responseBody),
-	}, nil
-}
-
-func errorHandler(err error) (events.APIGatewayProxyResponse, error) {
-	errorLogger.Println(err.Error())
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusInternalServerError,
-		Body:       http.StatusText(http.StatusInternalServerError),
-	}, nil
+	return seenIn
 }
 
 func main() {
-	lambda.Start(getActorInSeenAnimes)
+	userName := os.Args[1]
+	actorId := os.Args[2]
+
+	appearances := getActorInSeenAnimes(userName, actorId)
+
+	for _, a := range appearances {
+		fmt.Printf("\n%s: %s", a.Show, a.Character)
+	}
 }
