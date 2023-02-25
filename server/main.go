@@ -52,7 +52,13 @@ func unfoundRoute(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "Sorry, only GET and POST methods are supported.")
 }
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func router(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
 	switch r.Method {
 	case "GET":
 		getPage().ServeHTTP(w, r)

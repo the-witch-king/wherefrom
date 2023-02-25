@@ -2,6 +2,9 @@
 
 .DEFAULT_GOAL := serve
 
-serve:
-	cd server/frontend; npm run build
+run:
 	cd server; go run main.go types.go
+
+watch:
+	ulimit -n 1000
+	/Users/mike/.asdf/installs/golang/1.20.1/packages/bin/reflex -s -r '\.go$$' make run
