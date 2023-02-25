@@ -131,7 +131,7 @@ function App() {
                 <div
                     style={{
                         display: 'flex',
-                        width: '100vw',
+                        width: 'calc(100% - 8px)',
                         padding: 4,
                         alignItems: 'center',
                         justifyContent: 'center',
