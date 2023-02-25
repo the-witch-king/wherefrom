@@ -1,4 +1,4 @@
-import { Person, Voice } from '../types'
+import { Person, Voice } from './types'
 
 export const Results = ({
   seenIn,
