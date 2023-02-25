@@ -61,31 +61,43 @@ function App() {
                     alignItems: 'center',
                 }}
             >
-                <div style={{ flexDirection: 'column' }}>
-                    <label style={{ display: 'block' }} htmlFor="malUserName">
-                        MAL User Name:
-                    </label>
+                <div className="input-wrapper">
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <label
+                            style={{ display: 'block' }}
+                            htmlFor="malUserName"
+                        >
+                            MAL User Name:
+                        </label>
+                        <label
+                            style={{ display: 'flex', alignItems: 'center' }}
+                        >
+                            Save?
+                            <input
+                                type="checkbox"
+                                name="save-username"
+                                checked={saveUserName}
+                                onChange={({ target: { checked } }) =>
+                                    setSaveUserName(checked)
+                                }
+                            />
+                        </label>
+                    </div>
                     <input
                         id="malUserName"
                         name="malUserName"
                         value={malUserName}
+                        placeholder="xXx_shad0wKillerNaruto_xXx"
                         onChange={(e) => setMalUserName(e.target.value)}
                     />
                 </div>
 
-                <label>
-                    Remember username?
-                    <input
-                        type="checkbox"
-                        name="save-username"
-                        checked={saveUserName}
-                        onChange={({ target: { checked } }) =>
-                            setSaveUserName(checked)
-                        }
-                    />
-                </label>
-
-                <div style={{ flexDirection: 'column' }}>
+                <div className="input-wrapper">
                     <label style={{ display: 'block' }} htmlFor="malActorId">
                         MAL Voice Actor ID:
                     </label>
@@ -93,6 +105,7 @@ function App() {
                         id="malActorId"
                         name="malActorId"
                         value={actorId}
+                        placeholder="420"
                         onChange={(e) => setActorId(e.target.value)}
                     />
                 </div>

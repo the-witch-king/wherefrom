@@ -1,7 +1,65 @@
-label {
-  margin: 8px
+:root {
+    --grey: #dcd6f7ff;
+    --purple: #7353baff;
+    --dark-purple: #22162bff;
+    --pink: #e54f6dff;
+    --orange: #ee7b30ff;
 }
 
-input {
-  margin: 4px
+body {
+    background-color: var(--grey);
 }
+
+.App {
+    width: 100vw;
+}
+
+.input-wrapper {
+    width: calc(100% - 8px);
+    padding: 4px;
+  margin-top: 8px;
+}
+
+.input-wrapper label {
+    color: var(--dark-purple);
+    margin-bottom: 8px;
+}
+
+.input-wrapper input {
+    width: calc(100% - 5px);
+    border: none;
+    padding: 5px;
+
+    box-sizing: border-box;
+}
+
+.input-wrapper input:focus {
+  outline: 2px solid var(--pink);
+}
+
+
+button {
+	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background-size: 400% 400%;
+	animation: gradient 15s ease infinite;
+
+  width: calc(100vw - 5px);
+  margin-top: 16px;
+  height: 2rem;
+  color: white;
+  box-shadow: none;
+  border: none; 
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
