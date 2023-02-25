@@ -79,6 +79,9 @@ function App() {
                         >
                             Save?
                             <input
+                                style={{
+                                    margin: '0 8px'
+                                }}
                                 type="checkbox"
                                 name="save-username"
                                 checked={saveUserName}

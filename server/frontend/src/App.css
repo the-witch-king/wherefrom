@@ -4,6 +4,8 @@
     --dark-purple: #22162bff;
     --pink: #e54f6dff;
     --orange: #ee7b30ff;
+
+    font-family: 'Golos Text', sans-serif;
 }
 
 body {
@@ -17,7 +19,7 @@ body {
 .input-wrapper {
     width: calc(100% - 8px);
     padding: 4px;
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .input-wrapper label {
@@ -34,32 +36,30 @@ body {
 }
 
 .input-wrapper input:focus {
-  outline: 2px solid var(--pink);
+    outline: 2px solid var(--pink);
 }
 
-
 button {
-	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-	background-size: 400% 400%;
-	animation: gradient 15s ease infinite;
+    width: calc(100vw - 5px);
+    margin-top: 16px;
+    height: 2rem;
+    color: white;
+    box-shadow: none;
+    border: none;
 
-  width: calc(100vw - 5px);
-  margin-top: 16px;
-  height: 2rem;
-  color: white;
-  box-shadow: none;
-  border: none; 
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 5s ease infinite;
 }
 
 @keyframes gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
-
