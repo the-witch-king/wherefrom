@@ -9,18 +9,24 @@ import (
 	"os"
 )
 
-//go:embed static
-var mainPage embed.FS
+//go:embed frontend/build
+var build embed.FS
 
 func getPage() http.Handler {
-	fsys := fs.FS(mainPage)
-	html, _ := fs.Sub(fsys, "static")
+	fsys := fs.FS(build)
+	html, _ := fs.Sub(fsys, "frontend/build")
 
 	return http.FileServer(http.FS(html))
 }
 
 func getUserAnimeList(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "{ \"name\": \"Foo!\" }")
+	// body := r.Body
+	io.WriteString(w, "{ \"items\": [\"a\", \"b\", \"c\"] }")
+}
+
+func unfoundRoute(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	io.WriteString(w, "Sorry, only GET and POST methods are supported.")
 }
 
 func router(w http.ResponseWriter, r *http.Request) {
@@ -30,16 +36,13 @@ func router(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		getUserAnimeList(w, r)
 	default:
-		getPage().ServeHTTP(w, r)
+		unfoundRoute(w, r)
 	}
 }
 
 func main() {
 	mux := http.NewServeMux()
-	// mux.Handle("/", router)
-	// mux.HandleFunc("/", router)
 	mux.HandleFunc("/", router)
-
 	err := http.ListenAndServe(":3333", mux)
 
 	if err != nil {
