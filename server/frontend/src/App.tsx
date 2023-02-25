@@ -2,6 +2,7 @@ import './App.css'
 import { useEffect, useState } from 'react'
 import { useJikan, useMAL } from './hooks'
 import { Person, Voice } from './types'
+import { Results } from './results/results'
 
 const USERNAME_KEY = 'userName'
 
@@ -80,7 +81,7 @@ function App() {
                             Save?
                             <input
                                 style={{
-                                    margin: '0 8px'
+                                    margin: '0 8px',
                                 }}
                                 type="checkbox"
                                 name="save-username"
@@ -116,33 +117,7 @@ function App() {
                 <button type="submit">WHERE FROM??</button>
             </form>
 
-            <h2>{person?.name}</h2>
-            {person && (
-                <div>
-                    <table>
-                        <thead>
-                            <th>Pic</th>
-                            <th>Anime</th>
-                            <th>Character</th>
-                        </thead>
-                        <tbody>
-                            {seenIn.map((s) => (
-                                <tr>
-                                    <td>
-                                        <img
-                                            src={
-                                                s.character.images.jpg.image_url
-                                            }
-                                        />
-                                    </td>
-                                    <td>{s.anime.title}</td>
-                                    <td>{s.character.name}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+            {person && <Results person={person} seenIn={seenIn} />}
         </div>
     )
 }
