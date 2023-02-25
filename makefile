@@ -1,10 +1,11 @@
 #makefile
 
-.DEFAULT_GOAL := serve
+run-fe:
+	cd server/frontend; npm run start
 
-run:
+run-server:
 	cd server; go run main.go types.go
 
-watch:
+watch-server:
 	ulimit -n 1000
-	/Users/mike/.asdf/installs/golang/1.20.1/packages/bin/reflex -s -r '\.go$$' make run
+	/Users/mike/.asdf/installs/golang/1.20.1/packages/bin/reflex -s -r '\.go$$' make run-server
