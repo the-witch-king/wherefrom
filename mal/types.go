@@ -12,7 +12,7 @@ type MALAnime struct {
 		MainPicture struct {
 			Medium string `json:"medium"`
 			Large  string `json:"large"`
-		}
+		} `json:"main_picture"`
 	} `json:"node"`
 	ListStatus struct {
 		Status             string `json:"status"`

@@ -1,4 +1,4 @@
-import { Person } from './mal-types'
+import { Person, MALAnime } from './types'
 
 const jikanBaseUrl = 'https://api.jikan.moe/v4'
 const jikanPeopleUrl = `${jikanBaseUrl}/people`
@@ -16,14 +16,16 @@ export const useJikan = () => ({
 const baseUrl = `http://localhost:3333`
 
 export const useMAL = () => ({
-    getUserAnimeList: async (userName: string): Promise<any> => {
-        const list = await (
+    getUserAnimeList: async (
+        userName: string
+    ): Promise<Record<string, MALAnime>> => {
+        const userSeenMap = await (
             await fetch(`${baseUrl}`, {
                 method: 'POST',
                 body: JSON.stringify({ userName }),
             })
         ).json()
 
-        console.log('Got anime list:', list)
+        return userSeenMap
     },
 })

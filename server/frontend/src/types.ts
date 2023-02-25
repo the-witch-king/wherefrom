@@ -1,3 +1,20 @@
+/**
+ * MAL Types (Go)
+ */
+export interface MALAnime {
+    node: {
+        id: string
+        title: string
+        main_picture: {
+            medium: string
+            large: string
+        }
+    }
+}
+
+/**
+ * Jikan Types
+ */
 export interface Image {
     image_url: string
     large_image_url?: string

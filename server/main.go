@@ -2,15 +2,20 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
 	"net/http"
 	"os"
+
+	"wherefrom/m/v2/mal"
 )
 
 //go:embed frontend/build
 var build embed.FS
+
+var malClient = mal.MakeMALClient(os.Getenv("MAL_CLIENT_ID"))
 
 func getPage() http.Handler {
 	fsys := fs.FS(build)
@@ -20,8 +25,26 @@ func getPage() http.Handler {
 }
 
 func getUserAnimeList(w http.ResponseWriter, r *http.Request) {
-	// body := r.Body
-	io.WriteString(w, "{ \"items\": [\"a\", \"b\", \"c\"] }")
+	p := UserListRequestBody{}
+	err := json.NewDecoder(r.Body).Decode(&p)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		io.WriteString(w, "Unable to parse request.")
+		return
+	}
+
+	malUserName := p.UserName
+	userSeenAnime, err := malClient.GetUserSeenAnime(malUserName)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		io.WriteString(w, "Unable to get user's anime list")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(userSeenAnime)
 }
 
 func unfoundRoute(w http.ResponseWriter, r *http.Request) {
