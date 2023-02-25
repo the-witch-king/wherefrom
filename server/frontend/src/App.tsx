@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useJikan, useMAL } from './hooks'
 import { Person, Voice } from './types'
 import { Results } from './results'
+import { Loader } from './loader'
 
 const USERNAME_KEY = 'userName'
 
@@ -16,6 +17,7 @@ function App() {
     const [person, setPerson] = useState<Person>()
     const [seenIn, setSeenIn] = useState<Voice[]>([])
     const [collapsed, setCollapsed] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         const savedName = localStorage.getItem(USERNAME_KEY)
@@ -27,6 +29,7 @@ function App() {
     }, [malUserName, setMalUserName])
 
     const work = async (actorId: string) => {
+        setLoading(true)
         saveUserName
             ? localStorage.setItem(USERNAME_KEY, malUserName)
             : localStorage.removeItem(USERNAME_KEY)
@@ -44,15 +47,14 @@ function App() {
 
         setSeenIn(userSeenIn)
         setCollapsed(true)
-
-        console.group('Work done!')
-        console.log({ voiceActor, userAnimeList, userSeenIn })
-        console.groupEnd()
+        setLoading(false)
     }
 
     return (
         <div className="App">
             <header className="App-header"></header>
+
+            {loading && <Loader />}
             {!collapsed && (
                 <form
                     onSubmit={(e) => {
