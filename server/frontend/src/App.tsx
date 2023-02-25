@@ -136,12 +136,15 @@ function App() {
                         width: 'calc(100% - 8px)',
                         padding: 4,
                         alignItems: 'center',
-                        justifyContent: 'center',
+                        justifyContent: 'space-between',
+                        paddingLeft: 4,
+                        paddingRight: 4,
                         marginTop: collapsed ? 0 : 8,
                         backgroundColor: 'var(--orange)',
                     }}
                     onClick={() => setCollapsed(!collapsed)}
                 >
+                    <span>menu</span>
                     <span
                         style={{
                             display: 'block',
