@@ -144,7 +144,7 @@ function App() {
                     }}
                     onClick={() => setCollapsed(!collapsed)}
                 >
-                    <span>menu</span>
+                    <span>{collapsed ? 'show' : 'hide'} menu</span>
                     <span
                         style={{
                             display: 'block',

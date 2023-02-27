@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production - nah, we actually want this in tho because we use embed in go
+# /build
 
 # misc
 .DS_Store

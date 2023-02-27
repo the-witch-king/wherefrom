@@ -3,14 +3,20 @@ package main
 import (
 	"embed"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 
 	"wherefrom/m/v2/mal"
+
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 )
+
+const LAMBDA_ENV = "lambda"
+const DEV_ENV = "dev"
 
 //go:embed frontend/build
 var build embed.FS
@@ -72,10 +78,19 @@ func router(w http.ResponseWriter, r *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", router)
-	err := http.ListenAndServe(":3333", mux)
 
-	if err != nil {
-		fmt.Printf("\nUnable to start server.\n")
-		os.Exit(69)
+	env, found := os.LookupEnv("ENV")
+
+	if !found {
+		log.Fatalf("No environment set.")
+	}
+
+	if env == LAMBDA_ENV {
+		lambda.Start(httpadapter.New(mux).ProxyWithContext)
+	} else {
+		err := http.ListenAndServe(":3333", mux)
+		if err != nil {
+			log.Fatalf("Unable to start server.")
+		}
 	}
 }

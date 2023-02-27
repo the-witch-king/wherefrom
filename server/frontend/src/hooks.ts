@@ -13,7 +13,7 @@ export const useJikan = () => ({
     },
 })
 
-const baseUrl = `http://localhost:3333`
+const baseUrl = process.env.REACT_APP_API_URL
 
 export const useMAL = () => ({
     getUserAnimeList: async (
