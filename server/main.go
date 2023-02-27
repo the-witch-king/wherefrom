@@ -90,7 +90,7 @@ func main() {
 	} else {
 		err := http.ListenAndServe(":3333", mux)
 		if err != nil {
-			log.Fatalf("Unable to start server.")
+			log.Fatalf("Unable to start server. Error: %v", err)
 		}
 	}
 }

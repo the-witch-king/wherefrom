@@ -16,3 +16,7 @@
 
 # Additional stuff
 .envrc
+
+# Builds
+server/server
+wherefrom.zip
