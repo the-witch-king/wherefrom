@@ -18,13 +18,13 @@ import (
 const LAMBDA_ENV = "lambda"
 const DEV_ENV = "dev"
 
-//go:embed frontend/build
-var build embed.FS
+//go:embed frontend/build/*
+var reactApp embed.FS
 
 var malClient = mal.MakeMALClient(os.Getenv("MAL_CLIENT_ID"))
 
 func getPage() http.Handler {
-	fsys := fs.FS(build)
+	fsys := fs.FS(reactApp)
 	html, _ := fs.Sub(fsys, "frontend/build")
 
 	return http.FileServer(http.FS(html))

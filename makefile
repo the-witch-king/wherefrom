@@ -10,10 +10,10 @@ build-fe:
 	cd server/frontend; npm run build
 
 build-be:
-	cd server; GOOS=linux go build -o server main.go types.go
+	cd server; GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../main main.go types.go
 
 build-lambda:
-	make build-be; zip wherefrom.zip server/server
+	make build-be; zip wherefrom.zip main
 
 watch-server:
 	ulimit -n 1000

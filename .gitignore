@@ -18,5 +18,5 @@
 .envrc
 
 # Builds
-server/server
+main
 wherefrom.zip
